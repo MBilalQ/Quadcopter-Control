@@ -9,15 +9,15 @@ Servo ESC_right;  //  create object for right motor
 Servo ESC_left; //  create object for left motor   
 
 //initiate pin numbers
-const int ESCpin1 = 4; //PWM pin for ESC1
-const int ESCpin2 = 5;  //PWM pin for ESC2
+const int ESCpin1 = 4; //PWM pin for ESC1 right
+const int ESCpin2 = 5;  //PWM pin for ESC2 left
 
 //initiate variables
 float roll;
 float pitch;
 float yaw;
 
-const double kp = 0;
+const double kp = 0.5;
 const double ki = 0;
 const double kd = 0;
 
@@ -25,6 +25,8 @@ const int base_pwm = 100;
 const int max_pwm = 180;
 double pwm_left;
 double pwm_right;
+const int base_ms = 1500;
+const int max_ms = 2000;
 
 unsigned long currentTime, previousTime;
 double elapsedTime;
@@ -52,7 +54,7 @@ void setup() {
         }
     }
 
-    setPoint = 0;
+    setPoint = 1.70;
 }
 
 void loop() {
@@ -66,7 +68,7 @@ void loop() {
     
     if (mpu.update()) {
           static uint32_t prev_ms = millis();
-          if (millis() > prev_ms + 5) {
+          if (millis() > prev_ms + 10) {
               roll = mpu.getRoll();
               pitch = mpu.getPitch();
               yaw = mpu.getYaw();
@@ -75,21 +77,48 @@ void loop() {
       }
 
     output = computePID(roll); //gain
-    Serial.print("output: ");
-    Serial.println(output);
+    //Serial.print("output: ");
+    //Serial.println(output);
 
-    pwm_left = base_pwm + output;
+    pwm_left = base_pwm - output;
     pwm_left = clamp(pwm_left, 0, max_pwm);
     Serial.print("pwm left: ");
     Serial.println(pwm_left);
+    int round_pwm_left = (int)round(pwm_left);
+    Serial.print("round pwm left: ");
+    Serial.println(round_pwm_left);
 
-    pwm_right = base_pwm - output;
+    // pwm_left = base_ms - output;
+    // pwm_left = clamp(pwm_left, 0, max_ms);
+    // Serial.print("pwm left: ");
+    // Serial.println(pwm_left);
+    // int round_pwm_left = (int)round(pwm_left);
+    // Serial.print("round pwm left: ");
+    // Serial.println(round_pwm_left);
+
+    pwm_right = base_pwm + output;
     pwm_right = clamp(pwm_right, 0, max_pwm);
     Serial.print("pwm right: ");
     Serial.println(pwm_right);
+    int round_pwm_right = (int)round(pwm_right);
+    Serial.print("round pwm right: ");
+    Serial.println(round_pwm_right);
 
-    ESC_left.write(pwm_left);
-    ESC_right.write(pwm_right);
+    // pwm_right = base_ms + output;
+    // pwm_right = clamp(pwm_right, 0, max_ms);
+    // Serial.print("pwm right: ");
+    // Serial.println(pwm_right);
+    // int round_pwm_right = (int)round(pwm_right);
+    // Serial.print("round pwm right: ");
+    // Serial.println(round_pwm_right);
+
+    //int roundedValue = (int)round(value);
+
+    ESC_left.write(round_pwm_left);
+    ESC_right.write(round_pwm_right);
+
+    // ESC_left.writeMicroseconds(round_pwm_left);
+    // ESC_right.writeMicroseconds(round_pwm_right);
 
 }
 
@@ -100,6 +129,8 @@ double computePID(double inp){
         if (elapsedTime <=0) elapsedTime = 1;
 
         error = setPoint - inp;                                // determine error
+        //Serial.print("Error: ");
+        //Serial.println(error);
         cumError += error * elapsedTime;                // compute integral
         rateError = (error - lastError)/elapsedTime;   // compute derivative
 
