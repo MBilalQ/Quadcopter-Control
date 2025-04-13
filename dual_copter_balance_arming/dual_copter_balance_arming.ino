@@ -1,3 +1,6 @@
+// left motor starting pwm 28
+// right motor starting pwm 45
+
 //including libraries
 #include "MPU9250.h"
 #include <ESP32Servo.h>
@@ -8,8 +11,8 @@ Servo ESC_right;  //  create object for right motor
 Servo ESC_left; //  create object for left motor   
 
 //initiate pin numbers
-const int ESCpin1 = 4; //PWM pin for ESC1
-const int ESCpin2 = 5;  //PWM pin for ESC2
+const int ESCpin1 = 4; //PWM pin for ESC1 (right)
+const int ESCpin2 = 5; //PWM pin for ESC2 (left)
 
 //initiate variables
 float roll;
@@ -18,9 +21,12 @@ float yaw;
 const double kp = 0.5;  // Changed from 0 to provide some proportional control
 const double ki = 0.01; // Small integral gain
 const double kd = 0.1;  // Small derivative gain
-const int base_pwm = 40; // Increased from 100 to ensure motor starts
-const int min_pwm = 10;   // Minimum PWM to ensure motors can start
-const int max_pwm = 70;
+const int base_pwm_left = 40; // Increased from 100 to ensure motor starts
+const int base_pwm_right = 55;
+const int min_pwm_left = 28;   // Minimum PWM to ensure motors can start
+const int min_pwm_right = 45;
+const int max_pwm_left = 60;
+const int max_pwm_right = 75;
 double pwm_left;
 double pwm_right;
 unsigned long currentTime, previousTime;
@@ -81,8 +87,8 @@ void loop() {
     } 
     else if (currentArmingTime < 4000) {
       // Step 2: Brief pulse to mid-range and back to zero
-      ESC_right.write(30);
-      ESC_left.write(30);
+      ESC_right.write(base_pwm_left);
+      ESC_left.write(base_pwm_right);
       Serial.println("Arming step 2: Mid signal pulse");
     }
     else if (currentArmingTime < 6000) {
@@ -128,12 +134,12 @@ void loop() {
     Serial.println(output);
     
     // Calculate motor PWM values with a higher base_pwm
-    pwm_left = base_pwm + output;
-    pwm_right = base_pwm - output;
+    pwm_left = base_pwm_left + output;
+    pwm_right = base_pwm_right - output;
     
     // Ensure values are within safe operating range
-    pwm_left = clamp(pwm_left, min_pwm, max_pwm);
-    pwm_right = clamp(pwm_right, min_pwm, max_pwm);
+    pwm_left = clamp(pwm_left, min_pwm_left, max_pwm_left);
+    pwm_right = clamp(pwm_right, min_pwm_right, max_pwm_right);
     
     Serial.print("PWM left: ");
     Serial.print(pwm_left);
