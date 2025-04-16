@@ -1,0 +1,1 @@
+This repository is for a Quadcopter project which will be controlled using a feedback system. It has two phases; in phase 1 we will be making a beam balance using propellors (dual-copter) as a project for feedback control course, in phase 2 we will complete the Quadcopter
