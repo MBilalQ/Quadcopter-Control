@@ -18,15 +18,15 @@ const int ESCpin2 = 5; //PWM pin for ESC2 (left)
 float roll;
 float pitch;
 float yaw;
-const double kp = 0.5;  // Changed from 0 to provide some proportional control
-const double ki = 0.01; // Small integral gain
-const double kd = 0.1;  // Small derivative gain
-const int base_pwm_left = 40; // Increased from 100 to ensure motor starts
-const int base_pwm_right = 60;
-const int min_pwm_left = 28;   // Minimum PWM to ensure motors can start
-const int min_pwm_right = 45;
-const int max_pwm_left = 60;
-const int max_pwm_right = 75;
+const double kp = 1.2;  // Changed from 0 to provide some proportional control
+const double ki = 0; // Small integral gain
+const double kd = 0.2;  // Small derivative gain
+const int base_pwm_left = 0; // Increased from 100 to ensure motor starts
+const int base_pwm_right = 42;
+const int min_pwm_left = 0;   // Minimum PWM to ensure motors can start
+const int min_pwm_right = 35;
+const int max_pwm_left = 0;
+const int max_pwm_right = 50;
 double pwm_left;
 double pwm_right;
 unsigned long currentTime, previousTime;
@@ -67,7 +67,7 @@ void setup() {
   }
   
   Serial.println("MPU9250 initialized successfully!");
-  setPoint = 0;
+  setPoint = 1.2;
   
   // Mark the start time for arming sequence
   armingStartTime = millis();
@@ -87,8 +87,8 @@ void loop() {
     } 
     else if (currentArmingTime < 4000) {
       // Step 2: Brief pulse to mid-range and back to zero
-      ESC_right.write(base_pwm_left);
-      ESC_left.write(base_pwm_right);
+      ESC_right.write(base_pwm_right);
+      ESC_left.write(base_pwm_left);
       Serial.println("Arming step 2: Mid signal pulse");
     }
     else if (currentArmingTime < 6000) {
@@ -134,7 +134,7 @@ void loop() {
     Serial.println(output);
     
     // Calculate motor PWM values with a higher base_pwm
-    pwm_left = base_pwm_left + output;
+    pwm_left = base_pwm_left;
     pwm_right = base_pwm_right - output;
     
     // Ensure values are within safe operating range
