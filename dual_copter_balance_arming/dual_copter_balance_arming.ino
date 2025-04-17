@@ -21,11 +21,11 @@ float yaw;
 const double kp = 1.2;  // Changed from 0 to provide some proportional control
 const double ki = 0; // Small integral gain
 const double kd = 0.2;  // Small derivative gain
-const int base_pwm_left = 0; // Increased from 100 to ensure motor starts
+const int base_pwm_left = 101; // Increased from 100 to ensure motor starts
 const int base_pwm_right = 42;
-const int min_pwm_left = 0;   // Minimum PWM to ensure motors can start
+const int min_pwm_left = 101;   // Minimum PWM to ensure motors can start
 const int min_pwm_right = 35;
-const int max_pwm_left = 0;
+const int max_pwm_left = 101;
 const int max_pwm_right = 50;
 double pwm_left;
 double pwm_right;
